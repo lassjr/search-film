@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'security_key.dart';
+
+import './security_key.dart';
 
 void main() => runApp(new MyApp());
 
@@ -30,11 +31,15 @@ class _MyCustomFormState extends State<MyCustomForm> {
   }
 
   void searchFilm() {
-    var url = "http://www.omdbapi.com/?apikey=$API_KEY&s=${myController.text}";
-    http.get(url).then((response) {
-      print("response status: ${response.statusCode}");
-      print("Response body: ${response.body}");
-    });
+    if (myController.text.trim().isNotEmpty) {
+      var url =
+          "http://www.omdbapi.com/?apikey=$API_KEY&s=${myController.text.trim()}";
+
+      http.get(url).then((response) {
+        print("response status: ${response.statusCode}");
+        print("Response body: ${response.body}");
+      });
+    }
   }
 
   Widget build(BuildContext context) {
