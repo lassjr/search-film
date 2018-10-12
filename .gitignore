@@ -7,3 +7,5 @@
 build/
 
 .flutter-plugins
+
+security_key.dart
