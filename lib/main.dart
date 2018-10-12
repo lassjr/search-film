@@ -24,6 +24,7 @@ class MyCustomForm extends StatefulWidget {
 
 class _MyCustomFormState extends State<MyCustomForm> {
   final myController = TextEditingController();
+  final _titles = <String>['Simpson', 'Griffin', 'Marvel'];
 
   void dispose() {
     myController.dispose();
@@ -42,17 +43,42 @@ class _MyCustomFormState extends State<MyCustomForm> {
     }
   }
 
+  Widget _buildRow(String movieTitle) {
+    return ListTile(
+      title: Text(movieTitle),
+    );
+  }
+
+  List<Widget> _buildListViewChildren() {
+    final listWidget = <Widget>[];
+    _titles.forEach((element) {
+      listWidget.add(_buildRow(element));
+      listWidget.add(Divider());
+    });
+    return listWidget;
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Film Search'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: TextField(
-          onEditingComplete: searchFilm,
-          controller: myController,
-        ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              onEditingComplete: searchFilm,
+              controller: myController,
+            ),
+          ),
+          Flexible(
+            child: ListView(
+              padding: const EdgeInsets.all(8.0),
+              children: _buildListViewChildren(),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: searchFilm,
