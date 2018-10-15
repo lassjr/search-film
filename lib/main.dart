@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import './security_key.dart';
+import './movie.dart';
 
 void main() => runApp(new MyApp());
 
@@ -24,7 +26,7 @@ class MyCustomForm extends StatefulWidget {
 
 class _MyCustomFormState extends State<MyCustomForm> {
   final myController = TextEditingController();
-  final _titles = <String>['Simpson', 'Griffin', 'Marvel'];
+  final _movies = <Movie>[];
 
   void dispose() {
     myController.dispose();
@@ -37,8 +39,13 @@ class _MyCustomFormState extends State<MyCustomForm> {
           "http://www.omdbapi.com/?apikey=$API_KEY&s=${myController.text.trim()}";
 
       http.get(url).then((response) {
-        print("response status: ${response.statusCode}");
-        print("Response body: ${response.body}");
+        final film = json.decode(response.body)['Search'].toList();
+        setState(() {
+          _movies.clear();
+          film.forEach((element) {
+            _movies.add(Movie.fromJson(element));
+          });
+        });
       });
     }
   }
@@ -51,8 +58,8 @@ class _MyCustomFormState extends State<MyCustomForm> {
 
   List<Widget> _buildListViewChildren() {
     final listWidget = <Widget>[];
-    _titles.forEach((element) {
-      listWidget.add(_buildRow(element));
+    _movies.forEach((element) {
+      listWidget.add(_buildRow(element.title));
       listWidget.add(Divider());
     });
     return listWidget;
