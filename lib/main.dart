@@ -68,12 +68,48 @@ class _MyCustomFormState extends State<MyCustomForm> {
     return listWidget;
   }
 
+  void favorite() {
+    Navigator.of(context).push(
+      new MaterialPageRoute<void>(
+        builder: (BuildContext context) {
+          // final Iterable<ListTile> tiles = _saved.map(
+          //   (WordPair pair) {
+          //     return new ListTile(
+          //       title: new Text(
+          //         pair.asPascalCase,
+          //         style: _biggerFont,
+          //       ),
+          //     );
+          //   },
+          // );
+          // final List<Widget> divided = ListTile.divideTiles(
+          //   context: context,
+          //   tiles: tiles,
+          // ).toList();
+
+          return new Scaffold(
+            appBar: new AppBar(
+              title: const Text('Favorite Movies'),
+            ),
+            // body: new ListView(children: divided),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Film Search'),
-      ),
+      appBar: AppBar(title: Text('Film Search'), actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.favorite),
+          tooltip: 'PC',
+          onPressed: () {
+            favorite();
+          },
+        )
+      ]),
       body: Column(
         children: [
           Padding(
@@ -118,7 +154,7 @@ class InfoMovie extends StatefulWidget {
 }
 
 class _InfoMovieState extends State<InfoMovie> {
-  var newsMovie = Map();
+  var newsMovie = Map<String, String>();
 
   void _infoMovieState(Movie movie) {
     var url = "http://www.omdbapi.com/?apikey=$API_KEY&i=${movie.id}&plot=full";
@@ -127,12 +163,13 @@ class _InfoMovieState extends State<InfoMovie> {
       setState(() {
         newsMovie['rated'] = data['Rated'];
         newsMovie['plot'] = data['Plot'];
-        newsMovie['relased'] = data['Relased'];
+        newsMovie['released'] = data['Released'];
         newsMovie['runtime'] = data['Runtime'];
         newsMovie['genre'] = data['Genre'];
         newsMovie['director'] = data['Director'];
         newsMovie['writer'] = data['Writer'];
         newsMovie['actors'] = data['Actors'];
+        //print(data);
       });
     });
   }
@@ -161,18 +198,133 @@ class _InfoMovieState extends State<InfoMovie> {
 
   Widget _textSection(Movie movie) {
     return Container(
-      padding: const EdgeInsets.all(32.0),
-      child: Text(
-        newsMovie['plot'];
-        //newsMovie.containsKey('plot') ? newsMovie['plot'] : '',
-        softWrap: true,
+      padding: const EdgeInsets.all(12.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        textDirection: TextDirection.ltr,
+        children: <Widget>[
+          Text('Plot', style: TextStyle(fontWeight: FontWeight.bold)),
+          Padding(padding: const EdgeInsets.only(bottom: 12.0)),
+          Container(
+            padding: const EdgeInsets.only(bottom: 24.0),
+            child: Text(
+              newsMovie.containsKey('plot') ? newsMovie['plot'] : '',
+              softWrap: true,
+            ),
+          ),
+          Container(
+            child: Text(
+              'Genre',
+              style: TextStyle(fontWeight: FontWeight.bold),
+              softWrap: true,
+            ),
+          ),
+          Padding(padding: const EdgeInsets.only(bottom: 12.0)),
+          Container(
+            padding: const EdgeInsets.only(bottom: 24.0),
+            child: Text(
+              newsMovie.containsKey('genre') ? newsMovie['genre'] : '',
+              softWrap: true,
+            ),
+          ),
+          Container(
+            child: Text(
+              'Relased',
+              style: TextStyle(fontWeight: FontWeight.bold),
+              softWrap: true,
+            ),
+          ),
+          Padding(padding: const EdgeInsets.only(bottom: 12.0)),
+          Container(
+            padding: const EdgeInsets.only(bottom: 24.0),
+            child: Text(
+              newsMovie.containsKey('released') ? newsMovie['released'] : '',
+              softWrap: true,
+            ),
+          ),
+          Container(
+            child: Text(
+              'Runtime',
+              style: TextStyle(fontWeight: FontWeight.bold),
+              softWrap: true,
+            ),
+          ),
+          Padding(padding: const EdgeInsets.only(bottom: 12.0)),
+          Container(
+            padding: const EdgeInsets.only(bottom: 24.0),
+            child: Text(
+              newsMovie.containsKey('runtime') ? newsMovie['runtime'] : '',
+              softWrap: true,
+            ),
+          ),
+          Container(
+            child: Text(
+              'Director',
+              style: TextStyle(fontWeight: FontWeight.bold),
+              softWrap: true,
+            ),
+          ),
+          Padding(padding: const EdgeInsets.only(bottom: 12.0)),
+          Container(
+            padding: const EdgeInsets.only(bottom: 24.0),
+            child: Text(
+              newsMovie.containsKey('director') ? newsMovie['director'] : '',
+              softWrap: true,
+            ),
+          ),
+          Container(
+            child: Text(
+              'Writer',
+              style: TextStyle(fontWeight: FontWeight.bold),
+              softWrap: true,
+            ),
+          ),
+          Padding(padding: const EdgeInsets.only(bottom: 12.0)),
+          Container(
+            padding: const EdgeInsets.only(bottom: 24.0),
+            child: Text(
+              newsMovie.containsKey('writer') ? newsMovie['writer'] : '',
+              softWrap: true,
+            ),
+          ),
+          Container(
+            child: Text(
+              'Actors',
+              style: TextStyle(fontWeight: FontWeight.bold),
+              softWrap: true,
+            ),
+          ),
+          Padding(padding: const EdgeInsets.only(bottom: 12.0)),
+          Container(
+            padding: const EdgeInsets.only(bottom: 24.0),
+            child: Text(
+              newsMovie.containsKey('actors') ? newsMovie['actors'] : '',
+              softWrap: true,
+            ),
+          ),
+          Container(
+            child: Text(
+              'Rated',
+              style: TextStyle(fontWeight: FontWeight.bold),
+              softWrap: true,
+            ),
+          ),
+          Padding(padding: const EdgeInsets.only(bottom: 12.0)),
+          Container(
+            padding: const EdgeInsets.only(bottom: 24.0),
+            child: Text(
+              newsMovie.containsKey('rated') ? newsMovie['rated'] : '',
+              softWrap: true,
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _titleSection(Movie movie) {
     return Container(
-      padding: const EdgeInsets.all(32.0),
+      padding: const EdgeInsets.all(12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -203,5 +355,11 @@ class _InfoMovieState extends State<InfoMovie> {
         ],
       ),
     );
+    // return new ListTile(
+    //   title: new Text(
+
+    //   ),
+    //   trailing: new Icon()
+    // );
   }
 }
