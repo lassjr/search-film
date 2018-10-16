@@ -118,12 +118,29 @@ class InfoMovie extends StatefulWidget {
 }
 
 class _InfoMovieState extends State<InfoMovie> {
-  var net = Map();
+  var newsMovie = Map();
+
+  void _infoMovieState(Movie movie) {
+    var url = "http://www.omdbapi.com/?apikey=$API_KEY&i=${movie.id}&plot=full";
+    http.get(url).then((response) {
+      var data = json.decode(response.body);
+      setState(() {
+        newsMovie['rated'] = data['Rated'];
+        newsMovie['plot'] = data['Plot'];
+        newsMovie['relased'] = data['Relased'];
+        newsMovie['runtime'] = data['Runtime'];
+        newsMovie['genre'] = data['Genre'];
+        newsMovie['director'] = data['Director'];
+        newsMovie['writer'] = data['Writer'];
+        newsMovie['actors'] = data['Actors'];
+      });
+    });
+  }
 
   @override
   initState() {
     super.initState();
-    info(widget.movie);
+    _infoMovieState(widget.movie);
   }
 
   @override
@@ -142,28 +159,12 @@ class _InfoMovieState extends State<InfoMovie> {
     );
   }
 
-  info(Movie movie) {
-    var url = "http://www.omdbapi.com/?apikey=$API_KEY&i=${movie.id}&plot=full";
-    http.get(url).then((response) {
-      var data = json.decode(response.body);
-      setState(() {
-        net['rated'] = data['Rated'];
-        net['plot'] = data['Plot'];
-        net['relased'] = data['Relased'];
-        net['runtime'] = data['Runtime'];
-        net['genre'] = data['Genre'];
-        net['director'] = data['Director'];
-        net['writer'] = data['Writer'];
-        net['actors'] = data['Actors'];
-      });
-    });
-  }
-
   Widget _textSection(Movie movie) {
     return Container(
       padding: const EdgeInsets.all(32.0),
       child: Text(
-        net.containsKey('plot') ? net['plot'] : '',
+        newsMovie['plot'];
+        //newsMovie.containsKey('plot') ? newsMovie['plot'] : '',
         softWrap: true,
       ),
     );
