@@ -1,6 +1,9 @@
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io';
+import 'dart:async';
 
 import './security_key.dart';
 import './movie.dart';
@@ -27,6 +30,16 @@ class MyCustomForm extends StatefulWidget {
 class _MyCustomFormState extends State<MyCustomForm> {
   final myController = TextEditingController();
   final _movies = <Movie>[];
+  final Set<Movie> _favoriteMovies = new Set<Movie>();
+  final _movieStorage = new MovieStorage();
+
+  _MyCustomFormState() {
+    _movieStorage.readMovies().then((movies) {
+      setState(() {
+        _favoriteMovies.addAll(movies);
+      });
+    });
+  }
 
   void dispose() {
     myController.dispose();
@@ -50,21 +63,38 @@ class _MyCustomFormState extends State<MyCustomForm> {
     }
   }
 
-  Widget _buildRow(String movieTitle, int index) {
+  Widget _buildRow(Movie movie) {
+    final bool saved = _favoriteMovies.contains(movie);
     return ListTile(
-      title: Text(movieTitle),
+      title: Text(movie.title),
+      trailing: new Icon(
+        saved ? Icons.favorite : Icons.favorite_border,
+        color: saved ? Colors.red : null,
+      ),
       onTap: () {
-        _pushInfo(_movies[index]);
+        _pushInfo(movie);
+      },
+      onLongPress: () {
+        setState(() {
+          if (saved) {
+            _favoriteMovies.remove(movie);
+          } else {
+            _favoriteMovies.add(movie);
+          }
+          _movieStorage.writeMovies(_favoriteMovies.toList());
+        });
       },
     );
   }
 
   List<Widget> _buildListViewChildren() {
     final listWidget = <Widget>[];
-    for (int i = 0; i < _movies.length; i++) {
-      listWidget.add(_buildRow(_movies[i].title, i));
+
+    _movies.forEach((movie) {
+      listWidget.add(_buildRow(movie));
       listWidget.add(Divider());
-    }
+    });
+
     return listWidget;
   }
 
@@ -72,27 +102,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
     Navigator.of(context).push(
       new MaterialPageRoute<void>(
         builder: (BuildContext context) {
-          // final Iterable<ListTile> tiles = _saved.map(
-          //   (WordPair pair) {
-          //     return new ListTile(
-          //       title: new Text(
-          //         pair.asPascalCase,
-          //         style: _biggerFont,
-          //       ),
-          //     );
-          //   },
-          // );
-          // final List<Widget> divided = ListTile.divideTiles(
-          //   context: context,
-          //   tiles: tiles,
-          // ).toList();
-
-          return new Scaffold(
-            appBar: new AppBar(
-              title: const Text('Favorite Movies'),
-            ),
-            // body: new ListView(children: divided),
-          );
+          return new FavoritePage();
         },
       ),
     );
@@ -104,7 +114,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
       appBar: AppBar(title: Text('Film Search'), actions: <Widget>[
         IconButton(
           icon: Icon(Icons.favorite),
-          tooltip: 'PC',
+          tooltip: 'Favorite Movie',
           onPressed: () {
             favorite();
           },
@@ -169,7 +179,6 @@ class _InfoMovieState extends State<InfoMovie> {
         newsMovie['director'] = data['Director'];
         newsMovie['writer'] = data['Writer'];
         newsMovie['actors'] = data['Actors'];
-        //print(data);
       });
     });
   }
@@ -326,6 +335,7 @@ class _InfoMovieState extends State<InfoMovie> {
     return Container(
       padding: const EdgeInsets.all(12.0),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
@@ -355,11 +365,84 @@ class _InfoMovieState extends State<InfoMovie> {
         ],
       ),
     );
-    // return new ListTile(
-    //   title: new Text(
+  }
+}
 
-    //   ),
-    //   trailing: new Icon()
-    // );
+class MovieStorage {
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+
+    return directory.path;
+  }
+
+  Future<File> get _localFile async {
+    final path = await _localPath;
+    return File('$path/movies.txt');
+  }
+
+  Future<List<Movie>> readMovies() async {
+    try {
+      final file = await _localFile;
+
+      String contents = await file.readAsString();
+      List<Movie> movies = <Movie>[];
+      json.decode(contents).toList().forEach((movieData) {
+        movies.add(Movie.fromJson(movieData));
+      });
+
+      return movies;
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<File> writeMovies(List<Movie> movies) async {
+    final file = await _localFile;
+    String content = json.encode(movies);
+    return file.writeAsString('$content');
+  }
+}
+
+class FavoritePage extends StatefulWidget {
+  _MyFavoritePage createState() => _MyFavoritePage();
+}
+
+class _MyFavoritePage extends State<FavoritePage> {
+  final _movieStorage = new MovieStorage();
+  var divided = new List<Widget>();
+  Widget build(BuildContext context) {
+    _movieStorage.readMovies().then((movies) {
+      final Iterable<ListTile> tiles = movies.map(
+        (Movie movie) {
+          return new ListTile(
+            title: new Text(
+              movie.title,
+            ),
+            onTap: () {
+              Navigator.of(context).push(
+                new MaterialPageRoute<void>(
+                  builder: (BuildContext context) {
+                    return new InfoMovie(movie);
+                  },
+                ),
+              );
+            },
+          );
+        },
+      );
+      setState(() {
+        divided = ListTile.divideTiles(
+          context: context,
+          tiles: tiles,
+        ).toList();
+      });
+    });
+
+    return new Scaffold(
+      appBar: new AppBar(
+        title: const Text('Favorite Movies'),
+      ),
+      body: new ListView(children: divided),
+    );
   }
 }

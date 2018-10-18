@@ -16,4 +16,15 @@ class Movie {
       poster: json['Poster'],
     );
   }
+
+  Map<String, String> toJson() {
+    var map = Map<String, String>();
+    map['Title'] = this.title;
+    map['Year'] = this.year;
+    map['imdbID'] = this.id;
+    map['Type'] = this.type;
+    map['Poster'] = this.poster;
+
+    return map;
+  }
 }
