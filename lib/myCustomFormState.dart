@@ -49,7 +49,12 @@ class _MyCustomFormState extends State<MyCustomForm> {
   }
 
   Widget _buildRow(Movie movie) {
-    final bool saved = _favoriteMovies.contains(movie);
+    Movie movieFound = _favoriteMovies.firstWhere((element) {
+      return element == movie;
+    }, orElse: () {
+      return null;
+    });
+    final bool saved = movieFound != null;
     return ListTile(
       title: Text(movie.title),
       trailing: new Icon(

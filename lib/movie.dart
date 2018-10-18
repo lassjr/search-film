@@ -27,4 +27,10 @@ class Movie {
 
     return map;
   }
+
+  bool operator ==(dynamic other) {
+    if (other is! Movie) return false;
+    Movie movie = other;
+    return movie.id == this.id;
+  }
 }
