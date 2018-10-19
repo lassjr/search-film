@@ -1,4 +1,4 @@
-class Movie {
+class Movie extends Object {
   final String title;
   final String year;
   final String id;
@@ -28,9 +28,15 @@ class Movie {
     return map;
   }
 
+  @override
   bool operator ==(dynamic other) {
     if (other is! Movie) return false;
-    Movie movie = other;
-    return movie.id == this.id;
+
+    return other.id == this.id;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode;
   }
 }

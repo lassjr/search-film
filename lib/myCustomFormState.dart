@@ -49,12 +49,8 @@ class _MyCustomFormState extends State<MyCustomForm> {
   }
 
   Widget _buildRow(Movie movie) {
-    Movie movieFound = _favoriteMovies.firstWhere((element) {
-      return element == movie;
-    }, orElse: () {
-      return null;
-    });
-    final bool saved = movieFound != null;
+    final bool saved = _favoriteMovies.contains(movie);
+
     return ListTile(
       title: Text(movie.title),
       trailing: new Icon(
@@ -66,6 +62,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
       },
       onLongPress: () {
         setState(() {
+          // print(saved);
           if (saved) {
             _favoriteMovies.remove(movie);
           } else {
